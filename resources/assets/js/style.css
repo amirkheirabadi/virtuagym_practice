@@ -1,0 +1,27 @@
+#mainLayout {
+	margin-top: 50px;
+
+}
+.addButton {
+	margin: 0 0 20px 0;
+}
+
+.ReactModal__Content {
+	width: 400px;
+	margin: 0 auto;
+	height: 400px;
+}
+
+.list-group-item.active {
+	z-index: 0;
+}
+
+.sortableList{
+	margin-top: 10px;
+	padding: 0;
+}
+
+.sortableList li{
+	list-style: none;
+	margin-bottom: 10px;
+}

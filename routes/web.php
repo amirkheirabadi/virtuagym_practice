@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::resource('/users', 'UserController', ['except' => [
+    'show', 'create'
+]]);
+
+Route::resource('/plans', 'PlanController', ['except' => [
+    'show'
+]]);
