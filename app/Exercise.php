@@ -10,4 +10,9 @@ class Exercise extends Model
     protected $primaryKey = 'id';
 
     public $timestamps = false;
+
+    public function days()
+    {
+        return $this->belongsToMany('App\PlanDay', 'exercise_instances', 'exercise_id', 'day_id');
+    }
 }

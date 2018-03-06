@@ -8,6 +8,7 @@ import {
   arrayMove
 } from 'react-sortable-hoc'
 import ReactModal from 'react-modal'
+const NotificationSystem = require('react-notification-system')
 
 export default class PlanForm extends Component {
   constructor (props) {
@@ -19,6 +20,7 @@ export default class PlanForm extends Component {
       showModal: false,
 
       plan: {
+        id: 0,
         plan_name: '',
         plan_description: '',
         plan_difficulty: '',
@@ -36,7 +38,22 @@ export default class PlanForm extends Component {
   }
 
   componentDidMount () {
+    this._notificationSystem = this.refs.notificationSystem
+
     if (this.props.match.params.id) {
+      fetch('/plans/' + this.props.match.params.id + '/edit')
+        .then(res => res.json())
+        .then(data => {
+          this.setState({
+            plan: {
+              id: data.id,
+              plan_name: data.plan_name,
+              plan_description: data.plan_description,
+              plan_difficulty: data.plan_difficulty,
+              days: []
+            }
+          })
+        })
     } else {
       fetch('/plans/create')
         .then(res => res.json())
@@ -174,14 +191,14 @@ export default class PlanForm extends Component {
         bsStyle='primary'
         onClick={this.dayEdit.bind(this, id)}
       >
-        <span className='fa fa-edit' ></span>
+        <span className='fa fa-edit' />
       </Button>
 
       <Button
         bsStyle='danger'
         onClick={this.dayDelete.bind(this, id)}
         >
-        <span className='fa fa-trash'></span>
+        <span className='fa fa-trash' />
       </Button></div></li>)
 
     const SortableItemExercise = SortableElement(({ value, id }) => <li><div className='alert alert-primary' >{value}
@@ -230,7 +247,7 @@ export default class PlanForm extends Component {
                 <FormGroup>
                   <ControlLabel>Plan Name</ControlLabel>
                   <FormControl
-                    value={this.state.plan.plan_nam}
+                    value={this.state.plan.plan_name}
                     onChange={event => {
                       this.setState(prevState => ({
                         plan: {

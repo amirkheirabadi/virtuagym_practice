@@ -10,4 +10,9 @@ class User extends Model
     protected $primaryKey = "id";
 
     public $timestamps = false;
+
+    public function plans()
+    {
+        return $this->belongsToMany('App\Plan', 'plans_users', 'user_id', 'plan_id');
+    }
 }

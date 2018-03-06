@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import {Button, ButtonGroup} from 'react-bootstrap'
 import ReactModal from 'react-modal'
+const NotificationSystem = require('react-notification-system')
 
 import Layout from '../Layout'
 import UserForm from './UserForm'
@@ -23,15 +24,36 @@ export default class UserList extends Component {
     }
   }
 
+  displayError (messages) {
+    for (const msg in messages) {
+      this._notificationSystem.addNotification({
+        message: messages[msg][0],
+        level: 'error'
+      })
+    }
+  }
+
   componentDidMount () {
+    this._notificationSystem = this.refs.notificationSystem
     this.list()
   }
 
   list () {
-    fetch('/users').then(res => res.json()).then(data => {
-      this.setState({
-        users: data.users
-      })
+    fetch('/users').then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          this.displayError(data['messages'])
+          return 'error'
+        })
+      } else {
+        return res.json()
+      }
+    }).then(data => {
+      if (data != undefined) {
+        this.setState({
+          users: data.users
+        })
+      }
     })
   }
 
@@ -47,17 +69,28 @@ export default class UserList extends Component {
   }
 
   editForm (id) {
-    fetch('/users/' + id + '/edit').then(res => res.json()).then(data => {
-      this.setState({
-        user: {
-          action: 'edit',
-          id: data.id,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          email: data.email
-        },
-        showModal: true
-      })
+    fetch('/users/' + id + '/edit').then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          this.displayError(data['messages'])
+          return 'error'
+        })
+      } else {
+        return res.json()
+      }
+    }).then(data => {
+      if (data != undefined) {
+        this.setState({
+          user: {
+            action: 'edit',
+            id: data.id,
+            firstname: data.firstname,
+            lastname: data.lastname,
+            email: data.email
+          },
+          showModal: true
+        })
+      }
     })
   }
 
@@ -74,11 +107,22 @@ export default class UserList extends Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data)
-    }).then(res => res.json()).then(data => {
-      this.setState({
-        showModal: false
-      })
-      this.list()
+    }).then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          this.displayError(data['messages'])
+          return 'error'
+        })
+      } else {
+        return res.json()
+      }
+    }).then(data => {
+      if (data != undefined) {
+        this.setState({
+          showModal: false
+        })
+        this.list()
+      }
     })
   }
 
@@ -88,8 +132,19 @@ export default class UserList extends Component {
       headers: {
         'Content-Type': 'application/json'
       }
-    }).then(res => res.json()).then(data => {
-      this.list()
+    }).then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          this.displayError(data['messages'])
+          return 'error'
+        })
+      } else {
+        return res.json()
+      }
+    }).then(data => {
+      if (data != undefined) {
+        this.list()
+      }
     })
   }
 
@@ -149,6 +204,7 @@ export default class UserList extends Component {
         >
           <UserForm user={this.state.user} submit={this.submit.bind(this)} />
         </ReactModal>
+        <NotificationSystem ref='notificationSystem' />
       </Layout>
     )
   }
