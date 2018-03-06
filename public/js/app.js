@@ -82755,53 +82755,112 @@ var PlanForm = function (_Component) {
         fetch('/plans/' + this.props.match.params.id + '/edit').then(function (res) {
           return res.json();
         }).then(function (data) {
+          var days = [];
+
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = data.days[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var day = _step.value;
+
+              var exercises = [];
+
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                for (var _iterator2 = day.exercises[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var ex = _step2.value;
+
+                  exercises.push({
+                    duration: ex.pivot.exercise_duration,
+                    exercis: ex.id
+                  });
+                }
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                    _iterator2.return();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              days.push({
+                name: day.day_name,
+                exercises: exercises
+              });
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
           _this2.setState({
             plan: {
               id: data.id,
               plan_name: data.plan_name,
               plan_description: data.plan_description,
               plan_difficulty: data.plan_difficulty,
-              days: []
+              days: days
             }
           });
         });
-      } else {
-        fetch('/plans/create').then(function (res) {
-          return res.json();
-        }).then(function (data) {
-          _this2.setState({
-            exercises: data.exercises
-          });
-        });
       }
+      fetch('/plans/create').then(function (res) {
+        return res.json();
+      }).then(function (data) {
+        _this2.setState({
+          exercises: data.exercises
+        });
+      });
     }
   }, {
     key: 'findExerciseName',
     value: function findExerciseName(id) {
       var name = '';
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
 
       try {
-        for (var _iterator = this.state.exercises[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var ex = _step.value;
+        for (var _iterator3 = this.state.exercises[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var ex = _step3.value;
 
           if (ex.id == id) {
             name = ex.exercise_name;
           }
         }
       } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
           }
         } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
+          if (_didIteratorError3) {
+            throw _iteratorError3;
           }
         }
       }
@@ -82940,9 +82999,58 @@ var PlanForm = function (_Component) {
       });
     }
   }, {
+    key: 'storePlan',
+    value: function storePlan() {
+      var _this4 = this;
+
+      var data = {
+        plan_name: this.state.plan.plan_name,
+        plan_description: this.state.plan.plan_description,
+        plan_difficulty: this.state.plan.plan_difficulty
+      };
+      var address = '/plans';
+      var method = 'POST';
+      if (this.props.match.params.id) {
+        data['id'] = this.state.plan.id;
+        address = '/plans' + this.props.match.params.id;
+        method = 'PUT';
+      }
+
+      fetch(address, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      }).then(function (res) {
+        if (res.status === 400) {
+          res.json().then(function (data) {
+            _this4.displayError(data['messages']);
+            return 'error';
+          });
+        } else {
+          return res.json();
+        }
+      }).then(function (data) {
+        if (data != undefined) {
+          _this4.props.history.push('/plans');
+        }
+      });
+    }
+  }, {
+    key: 'displayError',
+    value: function displayError(messages) {
+      for (var msg in messages) {
+        this._notificationSystem.addNotification({
+          message: messages[msg][0],
+          level: 'error'
+        });
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this5 = this;
 
       var SortableItem = Object(__WEBPACK_IMPORTED_MODULE_4_react_sortable_hoc__["SortableElement"])(function (_ref3) {
         var value = _ref3.value,
@@ -82958,7 +83066,7 @@ var PlanForm = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
               {
                 bsStyle: 'primary',
-                onClick: _this4.dayEdit.bind(_this4, id)
+                onClick: _this5.dayEdit.bind(_this5, id)
               },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-edit' })
             ),
@@ -82966,7 +83074,7 @@ var PlanForm = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
               {
                 bsStyle: 'danger',
-                onClick: _this4.dayDelete.bind(_this4, id)
+                onClick: _this5.dayDelete.bind(_this5, id)
               },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-trash' })
             )
@@ -82988,7 +83096,7 @@ var PlanForm = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
               {
                 bsStyle: 'primary',
-                onClick: _this4.exercisEdit.bind(_this4, id)
+                onClick: _this5.exercisEdit.bind(_this5, id)
               },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-edit' })
             ),
@@ -82996,7 +83104,7 @@ var PlanForm = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
               {
                 bsStyle: 'danger',
-                onClick: _this4.exercisDelete.bind(_this4, id)
+                onClick: _this5.exercisDelete.bind(_this5, id)
               },
               __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-trash' })
             )
@@ -83011,7 +83119,7 @@ var PlanForm = function (_Component) {
           'ul',
           { className: 'sortableList' },
           exercise.map(function (value, index) {
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SortableItemExercise, { key: 'exercise-' + index, index: index, value: _this4.findExerciseName(value.exercis) + ' - ' + value.duration, id: index });
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SortableItemExercise, { key: 'exercise-' + index, index: index, value: _this5.findExerciseName(value.exercis) + ' - ' + value.duration, id: index });
           })
         );
       });
@@ -83059,7 +83167,7 @@ var PlanForm = function (_Component) {
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["d" /* FormControl */], {
                     value: this.state.plan.plan_name,
                     onChange: function onChange(event) {
-                      _this4.setState(function (prevState) {
+                      _this5.setState(function (prevState) {
                         return {
                           plan: _extends({}, prevState.plan, {
                             plan_name: event.target.value
@@ -83081,7 +83189,7 @@ var PlanForm = function (_Component) {
                     componentClass: 'textarea',
                     value: this.state.plan.plan_description,
                     onChange: function onChange(event) {
-                      _this4.setState(function (prevState) {
+                      _this5.setState(function (prevState) {
                         return {
                           plan: _extends({}, prevState.plan, {
                             plan_description: event.target.value
@@ -83106,7 +83214,7 @@ var PlanForm = function (_Component) {
                       placeholder: 'select',
                       value: this.state.plan.plan_difficulty,
                       onChange: function onChange(event) {
-                        _this4.setState(function (prevState) {
+                        _this5.setState(function (prevState) {
                           return {
                             plan: _extends({}, prevState.plan, {
                               plan_difficulty: event.target.value
@@ -83141,7 +83249,7 @@ var PlanForm = function (_Component) {
                   {
                     bsStyle: 'primary',
                     onClick: function onClick() {
-                      _this4.setState({
+                      _this5.setState({
                         showDayForm: true
                       });
                     }
@@ -83167,7 +83275,7 @@ var PlanForm = function (_Component) {
                   __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["d" /* FormControl */], {
                     value: this.state.dayName,
                     onChange: function onChange(event) {
-                      _this4.setState({
+                      _this5.setState({
                         dayName: event.target.value
                       });
                     }
@@ -83199,11 +83307,9 @@ var PlanForm = function (_Component) {
               __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
               {
                 bsStyle: 'success',
-                onClick: function onClick() {
-                  // this.props.submit(this.state)
-                }
+                onClick: this.storePlan.bind(this)
               },
-              'Create'
+              'Save Plan'
             )
           )
         ),
@@ -83215,7 +83321,7 @@ var PlanForm = function (_Component) {
             shouldCloseOnEsc: true,
             shouldCloseOnOverlayClick: true,
             onRequestClose: function onRequestClose() {
-              _this4.setState({
+              _this5.setState({
                 showModal: false
               });
             },
@@ -83226,7 +83332,8 @@ var PlanForm = function (_Component) {
               duration: this.state.duration,
               selectedExercise: this.state.selectedExercise
             }, storeExercise: this.storeExercise.bind(this) })
-        )
+        ),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(NotificationSystem, { ref: 'notificationSystem' })
       );
     }
   }]);

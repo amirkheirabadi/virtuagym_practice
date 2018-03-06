@@ -44,25 +44,42 @@ export default class PlanForm extends Component {
       fetch('/plans/' + this.props.match.params.id + '/edit')
         .then(res => res.json())
         .then(data => {
+          let days = []
+
+          for (const day of data.days) {
+            let exercises = []
+
+            for (const ex of day.exercises) {
+              exercises.push({
+                duration: ex.pivot.exercise_duration,
+                exercis: ex.id
+              })
+            }
+
+            days.push({
+              name: day.day_name,
+              exercises: exercises
+            })
+          }
+
           this.setState({
             plan: {
               id: data.id,
               plan_name: data.plan_name,
               plan_description: data.plan_description,
               plan_difficulty: data.plan_difficulty,
-              days: []
+              days: days
             }
           })
         })
-    } else {
-      fetch('/plans/create')
-        .then(res => res.json())
-        .then(data => {
-          this.setState({
-            exercises: data.exercises
-          })
-        })
     }
+    fetch('/plans/create')
+      .then(res => res.json())
+      .then(data => {
+        this.setState({
+          exercises: data.exercises
+        })
+      })
   }
 
   findExerciseName (id) {
@@ -183,6 +200,51 @@ export default class PlanForm extends Component {
         days: days
       }
     }))
+  }
+
+  storePlan () {
+    let data = {
+      plan_name: this.state.plan.plan_name,
+      plan_description: this.state.plan.plan_description,
+      plan_difficulty: this.state.plan.plan_difficulty
+    }
+    let address = '/plans'
+    let method = 'POST'
+    if (this.props.match.params.id) {
+      data['id'] = this.state.plan.id
+      address = '/plans' + this.props.match.params.id
+      method = 'PUT'
+    }
+
+    fetch(address, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }).then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          this.displayError(data['messages'])
+          return 'error'
+        })
+      } else {
+        return res.json()
+      }
+    }).then(data => {
+      if (data != undefined) {
+        this.props.history.push('/plans')
+      }
+    })
+  }
+
+  displayError (messages) {
+    for (const msg in messages) {
+      this._notificationSystem.addNotification({
+        message: messages[msg][0],
+        level: 'error'
+      })
+    }
   }
 
   render () {
@@ -352,11 +414,9 @@ export default class PlanForm extends Component {
             </div>
             <Button
               bsStyle='success'
-              onClick={() => {
-                // this.props.submit(this.state)
-              }}
+              onClick={this.storePlan.bind(this)}
             >
-              Create
+              Save Plan
             </Button>
           </div>
         </div>
@@ -380,6 +440,7 @@ export default class PlanForm extends Component {
             selectedExercise: this.state.selectedExercise
           }} storeExercise={this.storeExercise.bind(this)} />
         </ReactModal>
+        <NotificationSystem ref='notificationSystem' />
       </Layout>
     )
   }

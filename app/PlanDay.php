@@ -13,7 +13,7 @@ class PlanDay extends Model
 
     public function exercises()
     {
-        return $this->belongsToMany('App\Exercise', 'exercise_instances', 'day_id', 'exercise_id');
+        return $this->belongsToMany('App\Exercise', 'exercise_instances', 'day_id', 'exercise_id')->withPivot('exercise_duration', 'order');
     }
 
     public function plan()
