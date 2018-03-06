@@ -19,13 +19,11 @@ export default class PlanForm extends Component {
       showDayForm: false,
       showModal: false,
 
-      plan: {
-        id: 0,
-        plan_name: '',
-        plan_description: '',
-        plan_difficulty: '',
-        days: []
-      },
+      plan_id: 0,
+      plan_name: '',
+      plan_description: '',
+      plan_difficulty: '',
+      plan_days: [],
 
       exerciseData: [],
       exerciseAction: '',
@@ -63,13 +61,11 @@ export default class PlanForm extends Component {
           }
 
           this.setState({
-            plan: {
-              id: data.id,
-              plan_name: data.plan_name,
-              plan_description: data.plan_description,
-              plan_difficulty: data.plan_difficulty,
-              days: days
-            }
+            plan_id: data.id,
+            plan_name: data.plan_name,
+            plan_description: data.plan_description,
+            plan_difficulty: data.plan_difficulty,
+            plan_days: days
           })
         })
     }
@@ -101,10 +97,7 @@ export default class PlanForm extends Component {
 
   onSortEndDays ({ oldIndex, newIndex }) {
     this.setState(prevState => ({
-      plan: {
-        ...prevState.plan,
-        days: arrayMove(this.state.plan.days, oldIndex, newIndex)
-      }
+      plan_days: arrayMove(this.state.plan_days, oldIndex, newIndex)
     }))
   }
 
@@ -158,16 +151,13 @@ export default class PlanForm extends Component {
   }
 
   storeDay () {
-    let days = this.state.plan.days
+    let days = this.state.plan_days
     days.push({
       name: this.state.dayName,
       exercises: this.state.exerciseData
     })
     this.setState(prevState => ({
-      plan: {
-        ...prevState.plan,
-        days: days
-      },
+      plan_days: days,
       dayName: '',
       exerciseData: [],
       exerciseAction: '',
@@ -179,7 +169,7 @@ export default class PlanForm extends Component {
 
   dayEdit (index) {
     console.log('click')
-    let day = this.state.plan.days[index]
+    let day = this.state.plan_days[index]
 
     this.setState(prevState => ({
       dayName: day.name,
@@ -192,27 +182,25 @@ export default class PlanForm extends Component {
   }
 
   dayDelete (index) {
-    let days = this.state.plan.days
+    let days = this.state.plan_days
     days.splice(index, 1)
     this.setState(prevState => ({
-      plan: {
-        ...prevState.plan,
-        days: days
-      }
+      plan_days: days
     }))
   }
 
   storePlan () {
     let data = {
-      plan_name: this.state.plan.plan_name,
-      plan_description: this.state.plan.plan_description,
-      plan_difficulty: this.state.plan.plan_difficulty
+      plan_name: this.state.plan_name,
+      plan_description: this.state.plan_description,
+      plan_difficulty: this.state.plan_difficulty,
+      days: this.state.plan_days
     }
     let address = '/plans'
     let method = 'POST'
     if (this.props.match.params.id) {
-      data['id'] = this.state.plan.id
-      address = '/plans' + this.props.match.params.id
+      data['id'] = this.state.plan_id
+      address = '/plans/' + this.props.match.params.id
       method = 'PUT'
     }
 
@@ -309,14 +297,11 @@ export default class PlanForm extends Component {
                 <FormGroup>
                   <ControlLabel>Plan Name</ControlLabel>
                   <FormControl
-                    value={this.state.plan.plan_name}
+                    value={this.state.plan_name}
                     onChange={event => {
-                      this.setState(prevState => ({
-                        plan: {
-                          ...prevState.plan,
-                          plan_name: event.target.value
-                        }
-                      }))
+                      this.setState({
+                        plan_name: event.target.value
+                      })
                     }}
                   />
                 </FormGroup>
@@ -325,14 +310,11 @@ export default class PlanForm extends Component {
                   <ControlLabel>Plan Description</ControlLabel>
                   <FormControl
                     componentClass='textarea'
-                    value={this.state.plan.plan_description}
+                    value={this.state.plan_description}
                     onChange={event => {
-                      this.setState(prevState => ({
-                        plan: {
-                          ...prevState.plan,
-                          plan_description: event.target.value
-                        }
-                      }))
+                      this.setState({
+                        plan_description: event.target.value
+                      })
                     }}
                   />
                 </FormGroup>
@@ -342,14 +324,11 @@ export default class PlanForm extends Component {
                   <FormControl
                     componentClass='select'
                     placeholder='select'
-                    value={this.state.plan.plan_difficulty}
+                    value={this.state.plan_difficulty}
                     onChange={event => {
-                      this.setState(prevState => ({
-                        plan: {
-                          ...prevState.plan,
-                          plan_difficulty: event.target.value
-                        }
-                      }))
+                      this.setState({
+                        plan_difficulty: event.target.value
+                      })
                     }}
                   >
                     <option value='1'>Easy</option>
@@ -372,7 +351,7 @@ export default class PlanForm extends Component {
                 </Button>
 
                 <SortableListDay
-                  exercise={this.state.plan.days}
+                  exercise={this.state.plan_days}
                   onSortEnd={this.onSortEndDays.bind(this)}
                 />
               </div>

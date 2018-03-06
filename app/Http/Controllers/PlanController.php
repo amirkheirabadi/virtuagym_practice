@@ -59,7 +59,7 @@ class PlanController extends Controller
 
             $exercisOrder = 0;
             foreach ($day['exercises'] as $exe) {
-                Exercise::find($exe['exercis'])->roles()->save($planDay, ['exercise_duration' => $exe['duraion'], 'order' => $exercisOrder]);
+                Exercise::find($exe['exercis'])->days()->save($planDay, ['exercise_duration' => $exe['duration'], 'order' => $exercisOrder]);
                 $exercisOrder++;
             }
         }
@@ -122,7 +122,7 @@ class PlanController extends Controller
 
             $exercisOrder = 0;
             foreach ($day['exercises'] as $exe) {
-                Exercise::find($exe['exercis'])->roles()->save($planDay, ['exercise_duration' => $exe['duraion'], 'order' => $exercisOrder]);
+                Exercise::find($exe['exercis'])->days()->save($planDay, ['exercise_duration' => $exe['duration'], 'order' => $exercisOrder]);
                 $exercisOrder++;
             }
         }
