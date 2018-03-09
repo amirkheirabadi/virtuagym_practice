@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap'
+import { FormGroup, FormControl, ControlLabel, Button, ButtonGroup} from 'react-bootstrap'
 import Layout from '../Layout'
 import PlanExercise from './PlanExercise'
 import {
@@ -152,10 +152,18 @@ export default class PlanForm extends Component {
 
   storeDay () {
     let days = this.state.plan_days
-    days.push({
-      name: this.state.dayName,
-      exercises: this.state.exerciseData
-    })
+
+    if (this.state.dayAction == 'edit') {
+      days[this.state.dayActionId] = {
+        name: this.state.dayName,
+        exercises: this.state.exerciseData
+      }
+    } else {
+      days.push({
+        name: this.state.dayName,
+        exercises: this.state.exerciseData
+      })
+    }
     this.setState(prevState => ({
       plan_days: days,
       dayName: '',
@@ -168,7 +176,6 @@ export default class PlanForm extends Component {
   }
 
   dayEdit (index) {
-    console.log('click')
     let day = this.state.plan_days[index]
 
     this.setState(prevState => ({
@@ -177,7 +184,24 @@ export default class PlanForm extends Component {
       exerciseAction: '',
       exerciseEditId: 0,
       showDayForm: true,
-      showModal: false
+      showModal: false,
+      dayActionId: index,
+      dayAction: 'edit'
+    }))
+  }
+
+  newDay (index) {
+    let day = this.state.plan_days[index]
+
+    this.setState(prevState => ({
+      dayName: '',
+      exerciseData: '',
+      exerciseAction: '',
+      exerciseEditId: 0,
+      showDayForm: true,
+      showModal: false,
+      dayActionId: 0,
+      dayAction: 'create'
     }))
   }
 
@@ -237,34 +261,17 @@ export default class PlanForm extends Component {
 
   render () {
     const SortableItem = SortableElement(({ value, id }) => <li><div className='alert alert-primary' >{value}
-      <Button
-        bsStyle='primary'
-        onClick={this.dayEdit.bind(this, id)}
-      >
-        <span className='fa fa-edit' />
-      </Button>
-
-      <Button
-        bsStyle='danger'
-        onClick={this.dayDelete.bind(this, id)}
-        >
-        <span className='fa fa-trash' />
-      </Button></div></li>)
+      <ButtonGroup className="actionButton">
+        <Button bsStyle='primary' onClick={this.dayEdit.bind(this, id)}>Edit</Button>
+        <Button bsStyle='danger' onClick={this.dayDelete.bind(this, id)}>Del</Button>
+      </ButtonGroup>
+      </div></li>)
 
     const SortableItemExercise = SortableElement(({ value, id }) => <li><div className='alert alert-primary' >{value}
-      <Button
-        bsStyle='primary'
-        onClick={this.exercisEdit.bind(this, id)}
-        >
-        <i className='fa fa-edit' />
-      </Button>
-
-      <Button
-        bsStyle='danger'
-        onClick={this.exercisDelete.bind(this, id)}
-        >
-        <i className='fa fa-trash' />
-      </Button>
+      <ButtonGroup className="actionButton">
+        <Button bsStyle='primary' onClick={this.exercisEdit.bind(this, id)}>Edit</Button>
+        <Button bsStyle='danger' onClick={this.exercisDelete.bind(this, id)}>Del</Button>
+      </ButtonGroup>
     </div></li>)
 
     const SortableListExercise = SortableContainer(({ exercise }) => {
@@ -341,11 +348,7 @@ export default class PlanForm extends Component {
               <div className='col-md-4'>
                 <Button
                   bsStyle='primary'
-                  onClick={() => {
-                    this.setState({
-                      showDayForm: true
-                    })
-                  }}
+                  onClick={this.newDay.bind(this)}
                 >
                   Add Day
                 </Button>
@@ -369,21 +372,10 @@ export default class PlanForm extends Component {
                       }}
                   />
                   </FormGroup>
-
-                  <Button
-                    bsStyle='primary'
-                    onClick={this.newExercise.bind(this)}
-                >
-                  Add Exercise
-                </Button>
-
-                  <Button
-                    bsStyle='success'
-                    onClick={this.storeDay.bind(this)}
-                >
-                  Save Day
-                </Button>
-
+                  <ButtonGroup className="actionButton">
+                    <Button bsStyle='primary'  onClick={this.newExercise.bind(this)}>Add Exercise</Button>
+                    <Button bsStyle='success' onClick={this.storeDay.bind(this)}>Save Day</Button>
+                  </ButtonGroup>
                   <SortableListExercise
                     exercise={this.state.exerciseData}
                     onSortEnd={this.onSortEndExercise.bind(this)}

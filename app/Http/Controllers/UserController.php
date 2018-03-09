@@ -11,17 +11,6 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $users = User::all();
-        $validator = Validator::make($request->all(), [
-            'firstname' => 'required',
-            'lastname' => 'required',
-            'email' => 'required|email|unique:user',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'messages' => $validator->errors(),
-            ], 400);
-        }
 
         return response()->json(compact('users'));
     }

@@ -38,7 +38,7 @@ export default class PlanExercise extends Component {
             }}
           >
             {this.state.exercises.map((value, index) => (
-              <option value={value.id}>{value.exercise_name}</option>
+              <option key={'exe_' + index} value={value.id}>{value.exercise_name}</option>
           ))}
           </FormControl>
         </FormGroup>

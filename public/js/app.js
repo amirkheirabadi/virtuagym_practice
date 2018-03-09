@@ -69096,7 +69096,7 @@ exports = module.exports = __webpack_require__(278)(false);
 
 
 // module
-exports.push([module.i, "#mainLayout {\n\tmargin-top: 50px;\n\n}\n.addButton {\n\tmargin: 0 0 20px 0;\n}\n\n.ReactModal__Content {\n\twidth: 400px;\n\tmargin: 0 auto;\n\theight: 400px;\n}\n\n.list-group-item.active {\n\tz-index: 0;\n}\n\n.sortableList{\n\tmargin-top: 10px;\n\tpadding: 0;\n}\n\n.sortableList li{\n\tlist-style: none;\n\tmargin-bottom: 10px;\n}", ""]);
+exports.push([module.i, "#mainLayout {\n\tmargin-top: 50px;\n\n}\n.addButton {\n\tmargin: 0 0 20px 0;\n}\n\n.ReactModal__Content {\n\twidth: 400px;\n\tmargin: 0 auto;\n\theight: 400px;\n}\n\n.list-group-item.active {\n\tz-index: 0;\n}\n\n.sortableList{\n\tmargin-top: 10px;\n\tpadding: 0;\n}\n\n.sortableList li{\n\tlist-style: none;\n\tmargin-bottom: 10px;\n}\n\n.actionButton {\n\tmargin-left: 5px;\n}", ""]);
 
 // exports
 
@@ -69952,7 +69952,7 @@ var UserList = function (_Component) {
                 this.state.users.map(function (user) {
                   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'tr',
-                    null,
+                    { key: user.id },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       'th',
                       { scope: 'row' },
@@ -84505,7 +84505,7 @@ var PlanList = function (_Component) {
                 this.state.plans.map(function (plan) {
                   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'tr',
-                    null,
+                    { key: plan.plan_name },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       'th',
                       { scope: 'row' },
@@ -84595,7 +84595,7 @@ var PlanList = function (_Component) {
                 this.state.usersList.map(function (user) {
                   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'option',
-                    { value: '{user.id}' },
+                    { key: 'user_' + user.id, value: '{user.id}' },
                     user.firstname + ' ' + user.lastname
                   );
                 })
@@ -84634,7 +84634,7 @@ var PlanList = function (_Component) {
                 this.state.assignsList.map(function (user) {
                   return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'tr',
-                    null,
+                    { key: 'plan_' + user.id },
                     __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                       'th',
                       { scope: 'row' },
@@ -84936,10 +84936,18 @@ var PlanForm = function (_Component) {
     key: 'storeDay',
     value: function storeDay() {
       var days = this.state.plan_days;
-      days.push({
-        name: this.state.dayName,
-        exercises: this.state.exerciseData
-      });
+
+      if (this.state.dayAction == 'edit') {
+        days[this.state.dayActionId] = {
+          name: this.state.dayName,
+          exercises: this.state.exerciseData
+        };
+      } else {
+        days.push({
+          name: this.state.dayName,
+          exercises: this.state.exerciseData
+        });
+      }
       this.setState(function (prevState) {
         return {
           plan_days: days,
@@ -84955,7 +84963,6 @@ var PlanForm = function (_Component) {
   }, {
     key: 'dayEdit',
     value: function dayEdit(index) {
-      console.log('click');
       var day = this.state.plan_days[index];
 
       this.setState(function (prevState) {
@@ -84965,7 +84972,27 @@ var PlanForm = function (_Component) {
           exerciseAction: '',
           exerciseEditId: 0,
           showDayForm: true,
-          showModal: false
+          showModal: false,
+          dayActionId: index,
+          dayAction: 'edit'
+        };
+      });
+    }
+  }, {
+    key: 'newDay',
+    value: function newDay(index) {
+      var day = this.state.plan_days[index];
+
+      this.setState(function (prevState) {
+        return {
+          dayName: '',
+          exerciseData: '',
+          exerciseAction: '',
+          exerciseEditId: 0,
+          showDayForm: true,
+          showModal: false,
+          dayActionId: 0,
+          dayAction: 'create'
         };
       });
     }
@@ -85046,20 +85073,18 @@ var PlanForm = function (_Component) {
             { className: 'alert alert-primary' },
             value,
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-              {
-                bsStyle: 'primary',
-                onClick: _this5.dayEdit.bind(_this5, id)
-              },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-edit' })
-            ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-              {
-                bsStyle: 'danger',
-                onClick: _this5.dayDelete.bind(_this5, id)
-              },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('span', { className: 'fa fa-trash' })
+              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["b" /* ButtonGroup */],
+              { className: 'actionButton' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                { bsStyle: 'primary', onClick: _this5.dayEdit.bind(_this5, id) },
+                'Edit'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                { bsStyle: 'danger', onClick: _this5.dayDelete.bind(_this5, id) },
+                'Del'
+              )
             )
           )
         );
@@ -85076,20 +85101,18 @@ var PlanForm = function (_Component) {
             { className: 'alert alert-primary' },
             value,
             __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-              {
-                bsStyle: 'primary',
-                onClick: _this5.exercisEdit.bind(_this5, id)
-              },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-edit' })
-            ),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-              {
-                bsStyle: 'danger',
-                onClick: _this5.exercisDelete.bind(_this5, id)
-              },
-              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('i', { className: 'fa fa-trash' })
+              __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["b" /* ButtonGroup */],
+              { className: 'actionButton' },
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                { bsStyle: 'primary', onClick: _this5.exercisEdit.bind(_this5, id) },
+                'Edit'
+              ),
+              __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                { bsStyle: 'danger', onClick: _this5.exercisDelete.bind(_this5, id) },
+                'Del'
+              )
             )
           )
         );
@@ -85219,11 +85242,7 @@ var PlanForm = function (_Component) {
                   __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
                   {
                     bsStyle: 'primary',
-                    onClick: function onClick() {
-                      _this5.setState({
-                        showDayForm: true
-                      });
-                    }
+                    onClick: this.newDay.bind(this)
                   },
                   'Add Day'
                 ),
@@ -85253,20 +85272,18 @@ var PlanForm = function (_Component) {
                   })
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-                  {
-                    bsStyle: 'primary',
-                    onClick: this.newExercise.bind(this)
-                  },
-                  'Add Exercise'
-                ),
-                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-                  __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
-                  {
-                    bsStyle: 'success',
-                    onClick: this.storeDay.bind(this)
-                  },
-                  'Save Day'
+                  __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["b" /* ButtonGroup */],
+                  { className: 'actionButton' },
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                    { bsStyle: 'primary', onClick: this.newExercise.bind(this) },
+                    'Add Exercise'
+                  ),
+                  __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                    __WEBPACK_IMPORTED_MODULE_1_react_bootstrap__["a" /* Button */],
+                    { bsStyle: 'success', onClick: this.storeDay.bind(this) },
+                    'Save Day'
+                  )
                 ),
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(SortableListExercise, {
                   exercise: this.state.exerciseData,
@@ -85397,7 +85414,7 @@ var PlanExercise = function (_Component) {
             this.state.exercises.map(function (value, index) {
               return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                 'option',
-                { value: value.id },
+                { key: 'exe_' + index, value: value.id },
                 value.exercise_name
               );
             })

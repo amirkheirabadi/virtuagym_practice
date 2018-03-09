@@ -173,7 +173,7 @@ export default class UserList extends Component {
               </thead>
               <tbody>
                 {this.state.users.map(user => (
-                  <tr>
+                  <tr key={user.id}>
                     <th scope='row'>{user.id}</th>
                     <td>{user.firstname}</td>
                     <td>{user.lastname}</td>

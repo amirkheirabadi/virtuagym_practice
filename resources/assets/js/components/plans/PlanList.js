@@ -186,7 +186,7 @@ export default class PlanList extends Component {
               </thead>
               <tbody>
                 {this.state.plans.map(plan => (
-                  <tr>
+                  <tr key={plan.plan_name}>
                     <th scope='row'>{plan.id}</th>
                     <td>{plan.plan_name}</td>
                     <td>{plan.plan_description}</td>
@@ -229,7 +229,7 @@ export default class PlanList extends Component {
                 }}
             >
                 {this.state.usersList.map(user => (
-                  <option value='{user.id}'>{user.firstname + ' ' + user.lastname}</option>
+                  <option key={'user_' + user.id} value='{user.id}'>{user.firstname + ' ' + user.lastname}</option>
                  )) }
               </FormControl>
             </FormGroup>
@@ -245,7 +245,7 @@ export default class PlanList extends Component {
               </thead>
               <tbody>
                 {this.state.assignsList.map(user => (
-                  <tr>
+                  <tr key={'plan_' + user.id}>
                     <th scope='row'>{user.id}</th>
                     <td>{user.firstname + ' ' + user.lastname}</td>
                     <td>
